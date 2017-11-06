@@ -1,0 +1,22 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: eureka
+  name: eureka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: eureka
+  template:
+    metadata:
+      labels:
+        run: eureka
+    spec:
+      containers:
+      - image: netflixoss/eureka:1.3.1
+        name: eureka
+        ports:
+        - containerPort: 8080

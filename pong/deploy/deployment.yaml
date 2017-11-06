@@ -1,0 +1,26 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: pong
+  name: pong
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      run: pong
+  template:
+    metadata:
+      labels:
+        run: pong
+    spec:
+      containers:
+      - image: jose-armesto/pong
+        imagePullPolicy: IfNotPresent
+        name: pong
+        ports:
+        - containerPort: 8080
+        env:
+        - name: EUREKA
+          value: "http://eureka:8080/eureka/v2/"

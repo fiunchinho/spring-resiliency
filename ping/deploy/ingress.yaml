@@ -1,0 +1,13 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ping
+spec:
+  rules:
+  - host: ping
+    http:
+      paths:
+      - backend:
+          serviceName: ping
+          servicePort: 8080

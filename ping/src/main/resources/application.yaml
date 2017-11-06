@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: ping
+  main:
+    banner-mode: "off"
+
+management:
+  security:
+    enabled: false
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+      serviceUrl:
+        defaultZone: ${EUREKA}
+
+hystrix:
+  command:
+    hello:
+      circuitBreaker:
+        requestVolumeThreshold: 1
+        errorThresholdPercentage: 50

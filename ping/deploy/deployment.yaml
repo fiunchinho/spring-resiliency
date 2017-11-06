@@ -1,0 +1,26 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: ping
+  name: ping
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: ping
+  template:
+    metadata:
+      labels:
+        run: ping
+    spec:
+      containers:
+      - image: jose-armesto/ping
+        imagePullPolicy: IfNotPresent
+        name: ping
+        ports:
+        - containerPort: 8080
+        env:
+        - name: EUREKA
+          value: "http://eureka:8080/eureka/v2/"

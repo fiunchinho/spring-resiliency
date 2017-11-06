@@ -1,0 +1,73 @@
+group 'com.schibsted'
+version '0.1.0-SNAPSHOT'
+
+buildscript {
+    ext {
+        springBootVersion = '1.5.2.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath 'com.bmuschko:gradle-docker-plugin:3.2.0'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'com.bmuschko.docker-remote-api'
+
+jar {
+    baseName = 'ping'
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Camden.SR5"
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url "http://repo.spring.io/libs-milestone" }
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'org.springframework.cloud:spring-cloud-starter-eureka'
+    compile 'org.springframework.cloud:spring-cloud-starter-hystrix'
+    compile 'org.springframework.cloud:spring-cloud-starter-openfeign:1.4.0.RC1'
+}
+
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+
+task buildDockerImage(type: DockerBuildImage) {
+    inputDir = file('.')
+    tag = 'jose-armesto/' + jar.baseName
+    if (System.env.DOCKER_HOST) {
+        url = "$System.env.DOCKER_HOST".replace("tcp","https")
+        if (System.env.DOCKER_CERT_PATH) {
+            certPath = new File(System.env.DOCKER_CERT_PATH)
+
+        }
+    }
+    else {
+        url = 'unix:///var/run/docker.sock'
+    }
+}
+
+task deleteDeploy(type:Exec) {
+    ignoreExitValue true
+    commandLine 'kubectl', 'delete', '-f', 'deploy/'
+}
+task deploy(type:Exec) {
+    dependsOn deleteDeploy
+    commandLine 'kubectl', 'create', '-f', 'deploy/'
+}
+

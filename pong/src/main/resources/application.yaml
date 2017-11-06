@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: pong
+  main:
+    banner-mode: "off"
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+      serviceUrl:
+        defaultZone: ${EUREKA}

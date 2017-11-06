@@ -1,0 +1,3 @@
+rootProject.name = 'circuit-breaker'
+include 'pong'
+include 'ping'
