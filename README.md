@@ -51,9 +51,18 @@ This will open the circuit since **our error rate 33% is higher than the 20% thr
 $ curl -i "http://ping/"
 ```
 
+Let's configure retries so when `ping` requests to `pong` fail, `ping` will try sending the request to a different `pong` instance. That way, even though one instance is unhealthy, we will never get an error and the circuit will never be opened.
+```
+$ curl -i -XPOST "http://ping/env" -d ribbon.retryableStatusCodes=500
+```
+
+This tells the HTTP client to retry requests which received a 500 status code. It accepts a comma separated list of codes.
+If we keep sending requests, we'll see how now we don't get any error responses.
+
 ## Conclusion
 - Hystrix wraps the HTTP client. The client may or may not be a `LoadBalancer` client, which means that Hystrix is not aware of the different instances for a given service.
 - When requests start to fail, if the error percentage is higher than the defined error threshold percentage for a given service, Hystrix will open the circuit.
 - A potential workaround to minimize this is to add the percentage of unstable instances to the current error threshold percentage. Be careful: this will make your service tolerate more errors.
+- A better approach would be to use retries so requests are retries until reach a healthy instance.
 - A good healthcheck is needed for services. If a service is failing, the healthcheck should reflect that, de-registering the service from Eureka.
 - When using kubernetes, use the healthcheck for the liveness probe to stop receiving traffic if the application is unhealthy.

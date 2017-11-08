@@ -17,7 +17,14 @@ eureka:
 
 hystrix:
   command:
-    hello:
+    "PongClient#hello()":
       circuitBreaker:
         requestVolumeThreshold: 1
         errorThresholdPercentage: 50
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000 # Huge Hystrix timeout to basically remove the timeout, so retries have time to occur.
+
+ribbon:
+  retryableStatusCodes: 502,503
