@@ -1,12 +1,15 @@
 package com.schibsted.ping;
 
+import com.netflix.hystrix.strategy.HystrixPlugins;
 import feign.Client;
 import feign.RequestLine;
 import feign.codec.Decoder;
 import feign.hystrix.HystrixFeign;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.binder.hystrix.MicrometerMetricsPublisher;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -21,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.util.concurrent.TimeUnit;
 
@@ -72,6 +76,11 @@ class PongService {
 @Configuration
 @Import(FeignClientsConfiguration.class)
 class FeignConfiguration {
+
+    @PostConstruct
+    public void hystrixMetrics() {
+        HystrixPlugins.getInstance().registerMetricsPublisher(new MicrometerMetricsPublisher(Metrics.globalRegistry));
+    }
 
     @Bean
     public PongClient defaultFeignBuilder(Client defaultClient, Decoder decoder) {
