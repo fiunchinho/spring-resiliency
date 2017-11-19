@@ -1,4 +1,4 @@
-# Circuit breaker POC
+# Resiliency POC
 Let's use the following definitions
 
 - **Instance**: Single HTTP server.

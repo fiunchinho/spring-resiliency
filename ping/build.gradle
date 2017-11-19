@@ -5,6 +5,7 @@ buildscript {
     ext {
         springBootVersion = '1.5.2.RELEASE'
         springCloudVersion = 'Dalston.SR4'
+        micrometerVersion = '1.0.0-rc.4'
     }
     repositories {
         mavenCentral()
@@ -45,6 +46,9 @@ dependencies {
     compile 'org.springframework.cloud:spring-cloud-starter-hystrix'
     compile 'org.springframework.cloud:spring-cloud-starter-feign'
     compile 'org.springframework.retry:spring-retry'
+    compile "io.micrometer:micrometer-core:${micrometerVersion}"
+    compile "io.micrometer:micrometer-spring-legacy:${micrometerVersion}"
+    compile "io.micrometer:micrometer-registry-prometheus:${micrometerVersion}"
 }
 
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
