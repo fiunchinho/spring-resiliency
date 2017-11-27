@@ -3,6 +3,8 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: eureka
+  labels:
+    run: eureka
 spec:
   rules:
   - host: eureka

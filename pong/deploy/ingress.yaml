@@ -3,6 +3,8 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: pong
+  labels:
+    run: pong
 spec:
   rules:
   - host: pong
