@@ -3,6 +3,14 @@ spring:
     name: ping
   main:
     banner-mode: "off"
+  metrics:
+    filter:
+      hystrix:
+        percentiles: 0.50,0.95,0.999
+        histogram: true
+    web:
+      server:
+        record-request-percentiles: true
 
 management:
   security:

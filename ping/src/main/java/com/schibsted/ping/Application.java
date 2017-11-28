@@ -5,10 +5,7 @@ import feign.Client;
 import feign.RequestLine;
 import feign.codec.Decoder;
 import feign.hystrix.HystrixFeign;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.binder.hystrix.MicrometerMetricsPublisher;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,6 +13,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.cloud.netflix.feign.FeignClientsConfiguration;
 import org.springframework.cloud.netflix.hystrix.EnableHystrix;
+import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -26,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
 @EnableDiscoveryClient
@@ -47,29 +44,14 @@ interface PongClient {
 class PongService {
 
     private final PongClient client;
-    private final MeterRegistry meterRegistry;
-    private final Counter counter;
-    private final Timer timer;
 
     @Inject
-    public PongService(PongClient client, MeterRegistry meterRegistry) {
+    public PongService(PongClient client) {
         this.client = client;
-        this.meterRegistry = meterRegistry;
-        this.timer = Timer.builder("timer.http.clientes.requests")
-                .tags("uri", "/hello", "method", "GET", "status", "200")
-                .publishPercentiles(0.5, 0.95)
-                .register(meterRegistry);
-        this.counter = Counter.builder("http.clientes.requests")
-                .tags("uri", "/hello", "method", "GET", "status", "200")
-                .register(meterRegistry);
     }
 
     String hello() {
-        long startTime = System.nanoTime();
-        ResponseEntity<String> response = client.hello();
-        counter.increment();
-        timer.record(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
-        return response.getBody();
+        return client.hello().getBody();
     }
 }
 
