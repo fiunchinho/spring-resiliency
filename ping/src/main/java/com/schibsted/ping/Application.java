@@ -13,7 +13,6 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.cloud.netflix.feign.FeignClientsConfiguration;
 import org.springframework.cloud.netflix.hystrix.EnableHystrix;
-import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -66,11 +65,11 @@ class FeignConfiguration {
 
     @Bean
     public PongClient defaultFeignBuilder(Client defaultClient, Decoder decoder) {
-        PongClient fallback = () -> ResponseEntity.ok("Some fallback from ping");
+//        PongClient fallback = () -> ResponseEntity.ok("Some fallback from ping");
         return HystrixFeign.builder()
                 .client(defaultClient)
                 .decoder(decoder)
-                .target(PongClient.class, "http://pong", fallback);
+                .target(PongClient.class, "http://pong");
     }
 }
 
@@ -87,5 +86,10 @@ class HelloController {
     @RequestMapping("/")
     public String index() {
         return service.hello();
+    }
+
+    @RequestMapping("/500")
+    public String err() {
+        throw new NullPointerException("Testing exceptions");
     }
 }
