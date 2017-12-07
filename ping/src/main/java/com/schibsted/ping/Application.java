@@ -1,12 +1,9 @@
 package com.schibsted.ping;
 
-import com.netflix.hystrix.strategy.HystrixPlugins;
 import feign.Client;
 import feign.RequestLine;
 import feign.codec.Decoder;
 import feign.hystrix.HystrixFeign;
-import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.binder.hystrix.MicrometerMetricsPublisher;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -16,12 +13,12 @@ import org.springframework.cloud.netflix.hystrix.EnableHystrix;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 @SpringBootApplication
@@ -34,9 +31,24 @@ public class Application {
     }
 }
 
-interface PongClient {
-    @RequestLine("GET /")
-    ResponseEntity<String> hello();
+@RestController
+class HelloController {
+
+    private final PongService service;
+
+    @Inject
+    public HelloController(PongService service) {
+        this.service = service;
+    }
+
+    @RequestMapping("/")
+    public ResponseEntity<String> index() {
+        try {
+            return new ResponseEntity<>(service.hello(), HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
 }
 
 @Component
@@ -54,14 +66,14 @@ class PongService {
     }
 }
 
+interface PongClient {
+    @RequestLine("GET /")
+    ResponseEntity<String> hello();
+}
+
 @Configuration
 @Import(FeignClientsConfiguration.class)
 class FeignConfiguration {
-
-    @PostConstruct
-    public void hystrixMetrics() {
-        HystrixPlugins.getInstance().registerMetricsPublisher(new MicrometerMetricsPublisher(Metrics.globalRegistry));
-    }
 
     @Bean
     public PongClient defaultFeignBuilder(Client defaultClient, Decoder decoder) {
@@ -70,26 +82,5 @@ class FeignConfiguration {
                 .client(defaultClient)
                 .decoder(decoder)
                 .target(PongClient.class, "http://pong");
-    }
-}
-
-@RestController
-class HelloController {
-
-    private final PongService service;
-
-    @Inject
-    public HelloController(PongService service) {
-        this.service = service;
-    }
-
-    @RequestMapping("/")
-    public String index() {
-        return service.hello();
-    }
-
-    @RequestMapping("/500")
-    public String err() {
-        throw new NullPointerException("Testing exceptions");
     }
 }
