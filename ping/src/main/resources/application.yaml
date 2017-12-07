@@ -4,10 +4,6 @@ spring:
   main:
     banner-mode: "off"
   metrics:
-    filter:
-      hystrix:
-        percentiles: 0.50,0.95,0.999
-        histogram: true
     web:
       server:
         record-request-percentiles: true
@@ -22,17 +18,6 @@ eureka:
   client:
       serviceUrl:
         defaultZone: ${EUREKA}
-
-hystrix:
-  command:
-    "PongClient#hello()":
-      circuitBreaker:
-        requestVolumeThreshold: 1
-        errorThresholdPercentage: 50
-      execution:
-        isolation:
-          thread:
-            timeoutInMilliseconds: 10000 # Huge Hystrix timeout to basically remove the timeout, so retries have time to occur.
 
 ribbon:
   retryableStatusCodes: 502,503
