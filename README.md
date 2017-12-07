@@ -23,6 +23,8 @@ $ eval $(minikube docker-env)
 $ minikube addons enable ingress # Use ingress to expose the ping and pong services for testing and debugging
 $ echo "$(minikube ip) eureka ping pong" | sudo tee -a /etc/hosts # Update /etc/hosts to add minikube IP pointing to our services 
 $ kubectl create -f eureka/ # We need to start Eureka, since both ping and pong will use it
+$ helm upgrade --install "prometheus" stable/prometheus -f prometheus-values.yaml
+$ helm upgrade --install "grafana" stable/grafana -f grafana-values.yaml
 $ ./gradlew clean build buildDockerImage deploy
 ```
 
