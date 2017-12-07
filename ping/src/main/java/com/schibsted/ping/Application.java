@@ -1,15 +1,14 @@
 package com.schibsted.ping;
 
 import feign.Client;
+import feign.Feign;
 import feign.RequestLine;
 import feign.codec.Decoder;
-import feign.hystrix.HystrixFeign;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.cloud.netflix.feign.FeignClientsConfiguration;
-import org.springframework.cloud.netflix.hystrix.EnableHystrix;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -24,7 +23,6 @@ import javax.inject.Inject;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
-@EnableHystrix
 public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -77,8 +75,7 @@ class FeignConfiguration {
 
     @Bean
     public PongClient defaultFeignBuilder(Client defaultClient, Decoder decoder) {
-//        PongClient fallback = () -> ResponseEntity.ok("Some fallback from ping");
-        return HystrixFeign.builder()
+        return Feign.builder()
                 .client(defaultClient)
                 .decoder(decoder)
                 .target(PongClient.class, "http://pong");
