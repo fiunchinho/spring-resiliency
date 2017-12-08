@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Pong application
+name: pong
+version: 0.1.0

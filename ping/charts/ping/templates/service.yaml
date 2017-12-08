@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "ping.fullname" . }}
+  labels:
+    app: {{ template "ping.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  ports:
+    - port: {{ .Values.service.externalPort }}
+      targetPort: {{ .Values.service.internalPort }}
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "ping.name" . }}
+    release: {{ .Release.Name }}

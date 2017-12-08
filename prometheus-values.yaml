@@ -1,3 +1,5 @@
+rbac:
+  create: true
 server:
   ingress:
     enabled: true
@@ -15,7 +17,7 @@ serverFiles:
     # If you are using Kubernetes 1.7.2 or earlier, please take note of the comments
     # for the kubernetes-cadvisor job; you will need to edit or remove this job.
     global:
-      scrape_interval: 5s
+      scrape_interval: 7s
 
     # Scrape config for API servers.
     #

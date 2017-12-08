@@ -1,0 +1,18 @@
+replicaCount: 1
+image:
+  repository: jose-armesto/ping
+  tag: latest
+service:
+  externalPort: 8080
+  internalPort: 8080
+ingress:
+  hosts:
+    - ping
+  annotations: {}
+resources: {}
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi

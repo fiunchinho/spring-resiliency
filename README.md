@@ -22,7 +22,7 @@ $ minikube start
 $ eval $(minikube docker-env)
 $ minikube addons enable ingress # Use ingress to expose the ping and pong services for testing and debugging
 $ echo "$(minikube ip) eureka ping pong" | sudo tee -a /etc/hosts # Update /etc/hosts to add minikube IP pointing to our services 
-$ kubectl create -f eureka/ # We need to start Eureka, since both ping and pong will use it
+$ helm upgrade --install "eureka" eureka/charts/eureka # We need to start Eureka, since both ping and pong will use it
 $ helm upgrade --install "prometheus" stable/prometheus -f prometheus-values.yaml
 $ helm upgrade --install "grafana" stable/grafana -f grafana-values.yaml
 $ ./gradlew clean build buildDockerImage deploy
@@ -45,7 +45,7 @@ But the circuit is not opened: we see the fallback response every time the reque
 
 Now let's decrease to 20% the error threshold percentage for requests to the `pong` service (it was configured to 50%)
 ```
-$ curl -i -XPOST "http://ping/env" -d hystrix.command.hello.circuitBreaker.errorThresholdPercentage=20
+$ curl -i -XPOST "http://ping/env" -d hystrix.command."PongClient#hello()".circuitBreaker.errorThresholdPercentage=20
 ```
 
 This will open the circuit since **our error rate 33% is higher than the 20% threshold**. So you'll see that all the responses go straight to the fallback, even though we have healthy `pong` instances.

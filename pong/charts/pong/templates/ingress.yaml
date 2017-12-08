@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "pong.fullname" . }}
+  labels:
+    app: {{ template "pong.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    {{- range $key, $value := .Values.ingress.annotations }}
+      {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  rules:
+    - host: "pong"
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: {{ template "pong.fullname" . }}
+              servicePort: {{ .Values.service.externalPort }}

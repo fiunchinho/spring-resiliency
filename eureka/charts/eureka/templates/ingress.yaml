@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "eureka.fullname" . }}
+  labels:
+    app: {{ template "eureka.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    {{- range $key, $value := .Values.ingress.annotations }}
+      {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  rules:
+    - host: "eureka"
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: {{ template "eureka.name" . }}
+              servicePort: {{ .Values.service.externalPort }}
+

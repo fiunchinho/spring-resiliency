@@ -1,0 +1,18 @@
+replicaCount: 1
+image:
+  repository: netflixoss/eureka
+  tag: 1.3.1
+service:
+  externalPort: 8080
+  internalPort: 8080
+ingress:
+  hosts:
+    - eureka
+  annotations: {}
+resources: {}
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi

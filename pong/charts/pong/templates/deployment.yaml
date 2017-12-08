@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "pong.fullname" . }}
+  labels:
+    app: {{ template "pong.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "pong.name" . }}
+        release: {{ .Release.Name }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/prometheus"
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .Values.service.internalPort }}
+          env:
+            - name: EUREKA
+              value: "http://eureka:8080/eureka/v2/"
+          livenessProbe:
+            initialDelaySeconds: 60
+            httpGet:
+              path: /health
+              port: {{ .Values.service.internalPort }}
+          readinessProbe:
+            initialDelaySeconds: 60
+            httpGet:
+              path: /health
+              port: {{ .Values.service.internalPort }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}

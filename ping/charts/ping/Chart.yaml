@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Ping application
+name: ping
+version: 0.1.0

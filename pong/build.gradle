@@ -43,7 +43,7 @@ import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
 task buildDockerImage(type: DockerBuildImage) {
     inputDir = file('.')
-    tag = 'jose-armesto/' + jar.baseName
+    tag = "jose-armesto/${project.name}"
     if (System.env.DOCKER_HOST) {
         url = "$System.env.DOCKER_HOST".replace("tcp","https")
         if (System.env.DOCKER_CERT_PATH) {
@@ -56,11 +56,6 @@ task buildDockerImage(type: DockerBuildImage) {
     }
 }
 
-task deleteDeploy(type:Exec) {
-    ignoreExitValue true
-    commandLine 'kubectl', 'delete', '-f', 'deploy/'
-}
 task deploy(type:Exec) {
-    dependsOn deleteDeploy
-    commandLine 'kubectl', 'create', '-f', 'deploy/'
+    commandLine 'helm', 'upgrade', '--install', "${project.name}", "charts/${project.name}"
 }
